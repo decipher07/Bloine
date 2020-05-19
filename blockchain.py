@@ -100,14 +100,15 @@ def verify_chain():
 
 
 def verify_transactions():
-    is_valid = True 
-    for tx in open_transactions:
-        if verify_transaction(tx):
-            is_valid=True 
-        else :
-            is_valid = False 
+    return all([verify_transaction(tx) for tx in open_transactions])
+    # is_valid = True 
+    # for tx in open_transactions:
+    #     if verify_transaction(tx):
+    #         is_valid=True 
+    #     else :
+    #         is_valid = False 
     
-    return is_valid  
+    # return is_valid  
 
 
 waiting_for_input = True 
