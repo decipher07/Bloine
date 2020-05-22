@@ -55,7 +55,8 @@ class Node :
                     print('Transaction Failed')
                 print(self.blockchain.get_open_transactions())
             elif user_choice == '2' :
-                self.blockchain.mine_block()
+                if not self.blockchain.mine_block():
+                    print('Mining Failed, Got No Wallet?')
 
             elif user_choice == '3':
                 self.print_blockchain_elements()
