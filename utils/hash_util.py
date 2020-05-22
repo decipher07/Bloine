@@ -1,6 +1,8 @@
 import hashlib 
 import json 
 
+__all__ = ['hash_string_256', 'hash_block']
+
 def hash_string_256(string):
     return hashlib.sha256(string).hexdigest()
 
