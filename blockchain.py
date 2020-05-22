@@ -3,10 +3,10 @@ import hashlib
 import json 
 import pickle
 
-from hash_util import hash_string_256, hash_block
+from utils.hash_util import hash_block
+from utils.verification import Verification
 from block import Block 
 from transaction import Transaction 
-from verification import Verification 
 
 MINING_REWARD = 10 
 
