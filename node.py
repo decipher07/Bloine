@@ -1,27 +1,69 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from server_reloader import trigger_reload
+
 
 from wallet import Wallet
 from blockchain import Blockchain
 
 app = Flask(__name__)
 wallet = Wallet()
-Blockchain = Blockchain(wallet.public_key)
+blockchain = Blockchain(wallet.public_key)
 CORS(app)
+
+@app.route('/wallet', methods=['POST'])
+def create_keys():
+    wallet.create_keys()
+    if wallet.save_keys():
+        response = {
+            'public_key': wallet.public_key,
+            'private_key': wallet.private_key 
+        }
+        global blockchain 
+        blockchain = Blockchain(wallet.public_key)
+        return jsonify(response), 201 
+    else :
+        response = {
+            'message': 'Saving the keys Failed ',
+        }
+        return jsonify(response), 500 
+
+
+@app.route('/wallet', methods=['GET'])
+def load_keys():
+    if wallet.load_keys():
+            response = {
+                'public_key': wallet.public_key,
+                'private_key': wallet.private_key
+            }
+            global blockchain 
+            blockchain = Blockchain(wallet.public_key)
+            return jsonify(response), 201 
+    else :
+            response = {
+                'message': 'Loading the Keys Failed the keys Failed ',
+            }
+            return jsonify(response), 500 
+
+
+
+
 
 @app.route('/', methods=['GET'])
 def get_ui():
     return 'This Works!'
 
+
+
 @app.route('/mine', methods=['POST'])
 def mine():
-    block = Blockchain.mine_block()
+    block = blockchain.mine_block()
     if block != None :
         dict_block = block.__dict__.copy()
         dict_block['transactions'] = [tx.__dict__ for tx in dict_block['transactions']]
         response = {
             'message': 'Block Added Successfully',
-            'block': block
+            'block': dict_block
         }
         return jsonify(response), 201  
     else :
@@ -38,6 +80,7 @@ def get_chain():
     for dict_block in dict_chain:
         dict_block['transactions'] = [ tx.__dict__ for tx in dict_block['transactions']]
     return jsonify(dict_chain), 200  
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
