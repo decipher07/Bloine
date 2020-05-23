@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from server_reloader import trigger_reload
 
@@ -71,6 +71,60 @@ def get_balance():
             'wallet_set_up': wallet.public_key != None 
         }
         return jsonify(response), 500
+
+@app.route('/transaction', methods=['POST'])
+def add_transaction():
+
+    if wallet.public_key == None :
+        response = {
+            'message': 'No Wallet Set Up'
+        }
+        return jsonify(response), 400 
+    values = request.get_json() 
+    if not values :
+        response = {
+            'message': 'No Data Found'
+        }   
+        return response, 400 
+    required_fields = ['recipient', 'amount']
+    if not all(field in values for field in required_fields):
+        response = {
+            'message': 'Required Data is missing.',
+        }
+        return jsonify(response), 400 
+    
+    recipient = values['recipient']
+    amount = values['amount']
+    signature = wallet.sign_transaction(wallet.public_key, recipient, amount)
+    suceess = blockchain.add_transaction(recipient, wallet.public_key, signature, amount)
+
+    if suceess:
+        response =  {
+            'message': 'Successfully Added Transactions.',
+            'transaction': {
+                'sender': wallet.public_key ,
+                'recipient': recipient ,
+                'amount': amount ,
+                'signature': signature
+            },
+            'funds': blockchain.get_balance()
+        }
+        return jsonify(response), 201 
+    else :
+        response = {
+            'message': 'Creating a Transaction Failed'
+        }
+        return jsonify(response), 500
+
+@app.route('/transactions', methods=['GET'])
+def get_open_transactions():
+    transactions = blockchain.get_open_transactions()
+    dict_transactions = [tx.__dict__ for tx in transactions]
+    response = {
+        'message': 'Fetched Transaction Successfully.',
+        'transactions': dict_transactions 
+    }
+    return jsonify(dict_transactions),200 
 
 @app.route('/mine', methods=['POST'])
 def mine():
