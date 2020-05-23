@@ -4,5 +4,5 @@
         "titleBar.activeBackground": "#04493A",
         "titleBar.activeForeground": "#EDFEFA"
     },
-    "python.pythonPath": "/home/nopc/anaconda3/bin/python"
+    "python.pythonPath": "/home/nopc/anaconda3/envs/My_ENV/bin/python"
 }
