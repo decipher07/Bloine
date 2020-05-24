@@ -11,11 +11,13 @@ wallet = Wallet()
 blockchain = Blockchain(wallet.public_key)
 CORS(app)
 
-
 @app.route('/', methods=['GET'])
-def get_ui():
+def get_node_ui():
     return send_from_directory('ui', 'node.html')
 
+@app.route('/network', methods=['GET'])
+def get_network_ui():
+    return send_from_directory('ui', 'network.html')
 
 @app.route('/wallet', methods=['POST'])
 def create_keys():
@@ -193,8 +195,13 @@ def remove_node(node_url):
     }
     return jsonify(response), 200 
 
-
-
+@app.route('/nodes', methods=['GET'])
+def get_nodes():
+    nodes = blockchain.get_peer_nodes()
+    response = {
+        'all_nodes':nodes
+    }
+    return jsonify(response), 200 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
