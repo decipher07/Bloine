@@ -2,12 +2,14 @@ import functools
 import hashlib 
 import json 
 import pickle
+import requests
 
 from utils.hash_util import hash_block
 from utils.verification import Verification
 from block import Block 
 from transaction import Transaction 
 from wallet import Wallet 
+
 
 MINING_REWARD = 10 
 
@@ -104,12 +106,15 @@ class Blockchain:
 
 
 
-    def get_balance(self):
+    def get_balance(self, sender=None):
 
-        if self.public_key == None:
-            return None 
+        if sender == None :
+            if self.public_key == None:
+                return None 
+            participant = self.public_key
+        else :
+            participant = sender 
 
-        participant = self.public_key
         tx_sender = [[tx.amount for tx in block.transactions if tx.sender == participant] for block in self.__chain]
         open_tx_sender = [tx.amount for tx in self.__open_transactions if tx.sender == participant]
         tx_sender.append(open_tx_sender)
@@ -139,7 +144,7 @@ class Blockchain:
         return self.__chain[-1]
 
 
-    def add_transaction( self, recipient,sender, signature,amount=1.0):
+    def add_transaction( self, recipient,sender, signature,amount=1.0, is_receiving=False):
         
         
         # transaction = {
@@ -155,8 +160,19 @@ class Blockchain:
         if Verification.verify_transaction(transaction, self.get_balance):
             self.__open_transactions.append(transaction)   
             self.save_data()
+            if not is_receiving:
+                for node in self.__peer_nodes:
+                    url = 'http://{}/broadcast-transaction'.format(node)
+                    try:
+                        response = requests.post(url, json={'sender': sender, 'recipient': recipient, 'amount': amount, 'signature': signature})
+                        if response.status_code == 400 or response.status_code == 500 :
+                            print('Transactions Declined , Need Resolving')
+                            return False 
+                    except requests.exceptions.ConnectionError:
+                        continue 
             return True 
         return False 
+
 
 
     def mine_block(self):
