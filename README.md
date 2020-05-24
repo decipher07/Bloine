@@ -3,7 +3,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-A Scrapy Idea to Create My Own Bitcoin
+A Scrapy Idea to Create My Own CryptoCurrency
 
 
 ### Built With
