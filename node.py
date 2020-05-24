@@ -262,6 +262,15 @@ def get_nodes():
     }
     return jsonify(response), 200 
 
+@app.route('/resolve-conflicts', methods=['POST'])
+def resolve_conflicts():
+    replaced = blockchain.resolve()
+    if replaced :
+        response = {'message': 'Chain was Replaced'}
+    else :
+        response = {'message': 'Local Chain Kept!'} 
+    return jsonify(response), 200 
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()

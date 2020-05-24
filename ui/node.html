@@ -148,6 +148,7 @@
                 <div class="col">
                     <button class="btn btn-primary" @click="onLoadData">{{ view === 'chain' ? 'Load Blockchain' : 'Load Transactions' }}</button>
                     <button v-if="view === 'chain' && wallet" class="btn btn-success" @click="onMine">Mine Coins</button>
+                    <button class="btn btn-warning" @click='onResolve'> Resolve Conflicts</button>
                 </div>
             </div>
             <div class="row">
@@ -313,6 +314,19 @@
                             console.log(err)
                             vm.error = err.response.data.message;
                         })
+                },
+                OnResolve: function(){
+                    var vm = this
+                    axios.post('/resolve-conflicts')
+                        .then(res => {
+                            vm.error = null ;
+                            vm.success = res.data.message
+                        })
+                        .catch(err => {
+                            vm.success = null ;
+                            console.log(err)
+                            vm.error = err.response.data.message;
+                        }
                 },
                 onLoadData: function () {
                     if (this.view === 'chain'){
