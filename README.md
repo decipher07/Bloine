@@ -1,2 +1,2 @@
-# Bloine
+# DeepCoin
 A Scrap Idea 
