@@ -246,8 +246,10 @@ class Blockchain:
             try :
                 response = requests.get(url)
                 node_chain = response.json()
-                node_chain = [Block(block['index'], block['previous_hash'], block['transactions'], block['proof'], block['timestamp']) for block in node_chain]
-                node_chain.transactions = [Transaction(tx['sender'], tx['recipient'], tx['signature'], tx['amount']) for tx in node_chain['transactions']]
+                node_chain = [Block(block['index'], block['previous_hash'], [Transaction(tx['sender'], tx['recipient'], tx['signature'], tx['amount'])
+                                                                             for tx in block['transactions']], block['proof'], block['timestamp']) for block in node_chain]
+                ### This Works , Don't ask Why
+                
                 node_chain_length = len(node_chain)
                 local_chain_length = len(winner_chain)
                 if node_chain_length > local_chain_length and Verification.verify_chain(node_chain) :
