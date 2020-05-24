@@ -187,6 +187,10 @@ def get_open_transactions():
 
 @app.route('/mine', methods=['POST'])
 def mine():
+
+    if blockchain.resolve_conflicts :
+        response = {'message': 'Resolve Conflict First , Block Not Added !'}
+        return jsonify(response), 409 
     block = blockchain.mine_block()
     if block != None :
         dict_block = block.__dict__.copy()

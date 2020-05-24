@@ -40,7 +40,7 @@ class Blockchain:
     def load_data(self):
 
         try :
-            with open('blockchain.txt-{}'.format(self.node_id), mode='r') as f:
+            with open('blockchain-{}.txt'.format(self.node_id), mode='r') as f:
                 # file_content = pickle.loads(f.read())
                 
                 file_content = f.readlines()
@@ -79,7 +79,7 @@ class Blockchain:
 
     def save_data(self):
         try :
-            with open('blockchain.txt-{}'.format(self.node_id ), mode='w') as f:
+            with open('blockchain-{}.txt'.format(self.node_id ), mode='w') as f:
                 savable_chain = [block.__dict__ for  block in [Block(block_el.index, block_el.previous_hash, [tx.__dict__ for tx in block_el.transactions],block_el.proof,block_el.timestamp) for block_el  in self.__chain ]]
                 f.write(json.dumps(savable_chain))
                 f.write('\n')
@@ -237,6 +237,31 @@ class Blockchain:
                         print('Item was Already Removed ')
         self.save_data()
         return True 
+
+    def resolve (self):
+        winner_chain = self.chain 
+        replace = False 
+        for node in self.__peer_nodes:
+            url = 'http://{}/chain'.format(node)
+            try :
+                response = requests.get(url)
+                node_chain = response.json()
+                node_chain = [Block(block['index'], block['previous_hash'], block['transactions'], block['proof'], block['timestamp']) for block in node_chain]
+                node_chain.transactions = [Transaction(tx['sender'], tx['recipient'], tx['signature'], tx['amount']) for tx in node_chain['transactions']]
+                node_chain_length = len(node_chain)
+                local_chain_length = len(winner_chain)
+                if node_chain_length > local_chain_length and Verification.verify_chain(node_chain) :
+                    winner_chain = node_chain  
+                    replace = True 
+            except requests.exceptions.ConnectionError:
+                continue
+        self.resolve_conflicts = False 
+        self.chain = winner_chain
+        if replace :
+            self.__open_transactions = []
+        
+        self.save_data()
+        return replace 
 
     def add_peer_node(self, node):
         self.__peer_nodes.add(node)
