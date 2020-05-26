@@ -10,6 +10,7 @@ A Scrapy Idea to Create My Own CryptoCurrency
 Built Using Languages and Libraries Listed Below 
 * [Python](https://docs.python.org/3/)
 * [Flask](https://flask.palletsprojects.com/en/1.1.x/)
+* [VueJS](https://vuejs.org/v2/guide/)
 * [pycryptodome](https://pycryptodome.readthedocs.io/en/latest/src)
 
 
@@ -53,7 +54,7 @@ Contributions are what make the open source community such an amazing place to b
 
 **Deepankar Jain -** 
 
-[LinkedIn](https://www.linkedin.com/in/deepankar-jain-3997551a9/)
+[LinkedIn](https://www.linkedin.com/in/decipher07/)
 
 [Email](social.deej@gmail.com)
 
